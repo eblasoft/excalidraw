@@ -1407,7 +1407,14 @@ class App extends React.Component<ExcalidrawProps, AppState> {
     }
     if (opts.clearScene) {
       this.resetScene();
+    } else {
+      // even if we're not clearing scene, we shouldn't carry over deleted
+      // elements because it's not intuitive that clearing a scene before
+      // creating a room would nevertheless persist those deleted elements
+      // to server (which is a privacy concern)
+      this.scene.replaceAllElements(this.scene.getElements());
     }
+
     const roomMatch = getCollaborationLinkData(window.location.href);
     if (roomMatch) {
       const roomID = roomMatch[1];
