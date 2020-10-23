@@ -48,7 +48,7 @@ import {
   loadFromBlob,
   SOCKET_SERVER,
   SocketUpdateDataSource,
-  exportCanvas,
+  exportCanvas, loadFromJSON,
 } from "../data";
 import Portal from "./Portal";
 
@@ -175,12 +175,13 @@ import {
 } from "../element/binding";
 import { MaybeTransformHandleType } from "../element/transformHandles";
 import { renderSpreadsheet } from "../charts";
-import { isValidLibrary } from "../data/json";
+import {isValidLibrary, serializeAsJSON} from "../data/json";
 import {
   loadFromFirebase,
   saveToFirebase,
   isSavedToFirebase,
 } from "../data/firebase";
+import {exportToCanvas} from "../scene/export";
 
 /**
  * @param func handler taking at most single parameter (event).
@@ -321,6 +322,36 @@ class App extends React.Component<ExcalidrawProps, AppState> {
 
     this.actionManager.registerAction(createUndoAction(history));
     this.actionManager.registerAction(createRedoAction(history));
+    window.addEventListener("message", (event) => {
+      if(event.data.isNew){
+        const blob = new Blob([event.data.data], { type: 'application/json' });
+        loadFromBlob(blob, this.state)
+          .then(({ elements, appState }) =>
+            this.syncActionResult({
+              elements,
+              appState: {
+                ...(appState || this.state),
+                isLoading: false,
+              },
+              commitToHistory: true,
+            }),
+          )
+          .catch((error) => {
+            this.setState({ isLoading: false, errorMessage: error.message });
+          });
+      } else{
+        const tempCanvas = exportToCanvas(this.scene.getElements(), this.state, {
+          exportBackground : true,
+          viewBackgroundColor : "#ffffff",
+          exportPadding : 10  ,
+          scale : 1,
+          shouldAddWatermark : false,
+        });
+        const serialized = serializeAsJSON(this.scene.getElements(), this.state);
+        window.parent.postMessage({canvas: tempCanvas.toDataURL() , json: serialized},event.data.origin);
+      }
+
+    });
   }
 
   public render() {
@@ -607,7 +638,8 @@ class App extends React.Component<ExcalidrawProps, AppState> {
     if (isExternalScene) {
       if (
         this.shouldForceLoadScene(scene) ||
-        window.confirm(t("alerts.loadSceneOverridePrompt"))
+          true
+         // window.confirm(t("alerts.loadSceneOverridePrompt"))
       ) {
         // Backwards compatibility with legacy url format
         if (id) {
