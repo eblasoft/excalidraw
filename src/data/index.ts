@@ -185,6 +185,7 @@ export async function exportToBackend(
   appState: AppState,
 ) {
   const json = serializeAsJSON(elements, appState);
+  console.log(json);
   const encoded = new TextEncoder().encode(json);
 
   const key = await window.crypto.subtle.generateKey(

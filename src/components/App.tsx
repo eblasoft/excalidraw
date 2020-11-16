@@ -134,6 +134,8 @@ import {
 } from "../data/localStorage";
 
 import throttle from "lodash.throttle";
+import {exportToCanvas} from "../scene/export";
+import {serializeAsJSON} from "../data/json";
 
 /**
  * @param func handler taking at most single parameter (event).
@@ -344,6 +346,39 @@ class App extends React.Component<any, AppState> {
     if (isCollaborationScene) {
       this.initializeSocketClient({ showLoadingState: true });
     }
+
+    // send event to parent
+    window.addEventListener("message", (event) => {
+      console.log(event);
+      if(event.data.isNew){
+        const blob = new Blob([event.data.data], { type: 'application/json' });
+        loadFromBlob(blob)
+          .then(({ elements, appState }) =>
+            this.syncActionResult({
+              elements,
+              appState: {
+                ...(appState || this.state),
+                isLoading: false,
+              },
+              commitToHistory: true,
+            }),
+          )
+          .catch((error) => {
+            this.setState({ isLoading: false, errorMessage: error.message });
+          });
+      } else{
+        const tempCanvas = exportToCanvas(globalSceneState.getElements(), this.state, {
+          exportBackground : true,
+          viewBackgroundColor : "#ffffff",
+          exportPadding : 10  ,
+          scale : 1,
+          shouldAddWatermark : false,
+        });
+        const serialized = serializeAsJSON(globalSceneState.getElements(), this.state);
+        window.parent.postMessage({canvas: tempCanvas.toDataURL() , json: serialized},event.data.origin);
+      }
+
+    });
   };
 
   private unmounted = false;

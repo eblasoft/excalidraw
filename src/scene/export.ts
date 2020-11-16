@@ -1,13 +1,13 @@
 import rough from "roughjs/bin/rough";
 import oc from "open-color";
-import { newTextElement } from "../element";
-import { NonDeletedExcalidrawElement } from "../element/types";
-import { getCommonBounds } from "../element/bounds";
-import { renderScene, renderSceneToSvg } from "../renderer/renderScene";
-import { distance, SVG_NS, measureText } from "../utils";
-import { normalizeScroll } from "./scroll";
-import { AppState } from "../types";
-import { t } from "../i18n";
+import {newTextElement} from "../element";
+import {NonDeletedExcalidrawElement} from "../element/types";
+import {getCommonBounds} from "../element/bounds";
+import {renderScene, renderSceneToSvg} from "../renderer/renderScene";
+import {distance, SVG_NS, measureText} from "../utils";
+import {normalizeScroll} from "./scroll";
+import {AppState} from "../types";
+import {t} from "../i18n";
 
 export const SVG_EXPORT_TAG = `<!-- svg-source:excalidraw -->`;
 
@@ -99,6 +99,7 @@ export function exportToSvg(
     const [, , maxX, maxY] = getCommonBounds(elements);
     sceneElements = [...sceneElements, getWatermarkElement(maxX, maxY)];
   }
+  console.log(sceneElements);
 
   // calculate canvas dimensions
   const [minX, minY, maxX, maxY] = getCommonBounds(sceneElements);
@@ -153,7 +154,7 @@ export function exportToSvg(
 function getWatermarkElement(maxX: number, maxY: number) {
   const text = t("labels.madeWithExcalidraw");
   const font = "16px Virgil";
-  const { width: textWidth } = measureText(text, font);
+  const {width: textWidth} = measureText(text, font);
 
   return newTextElement({
     text,

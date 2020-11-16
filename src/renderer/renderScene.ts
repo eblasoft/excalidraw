@@ -513,6 +513,7 @@ export function renderSceneToSvg(
   // render elements
   elements.forEach((element) => {
     if (!element.isDeleted) {
+      console.log(element);
       renderElementToSvg(
         element,
         rsvg,

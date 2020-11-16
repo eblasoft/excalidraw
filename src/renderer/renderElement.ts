@@ -3,19 +3,19 @@ import {
   ExcalidrawTextElement,
   NonDeletedExcalidrawElement,
 } from "../element/types";
-import { isTextElement, isLinearElement } from "../element/typeChecks";
+import {isTextElement, isLinearElement} from "../element/typeChecks";
 import {
   getDiamondPoints,
   getArrowPoints,
   getElementAbsoluteCoords,
 } from "../element/bounds";
-import { RoughCanvas } from "roughjs/bin/canvas";
-import { Drawable, Options } from "roughjs/bin/core";
-import { RoughSVG } from "roughjs/bin/svg";
-import { RoughGenerator } from "roughjs/bin/generator";
-import { SceneState } from "../scene/types";
-import { SVG_NS, distance } from "../utils";
-import { isPathALoop } from "../math";
+import {RoughCanvas} from "roughjs/bin/canvas";
+import {Drawable, Options} from "roughjs/bin/core";
+import {RoughSVG} from "roughjs/bin/svg";
+import {RoughGenerator} from "roughjs/bin/generator";
+import {SceneState} from "../scene/types";
+import {SVG_NS, distance} from "../utils";
+import {isPathALoop} from "../math";
 import rough from "roughjs/bin/rough";
 
 const CANVAS_PADDING = 20;
@@ -71,7 +71,7 @@ function generateElementCanvas(
     1 / (window.devicePixelRatio * zoom),
     1 / (window.devicePixelRatio * zoom),
   );
-  return { element, canvas, canvasZoom: zoom, canvasOffsetX, canvasOffsetY };
+  return {element, canvas, canvasZoom: zoom, canvasOffsetX, canvasOffsetY};
 }
 
 function drawElementOnCanvas(
@@ -145,15 +145,11 @@ function drawElementOnCanvas(
   context.globalAlpha = 1;
 }
 
-const elementWithCanvasCache = new WeakMap<
-  ExcalidrawElement,
-  ExcalidrawElementWithCanvas
->();
+const elementWithCanvasCache = new WeakMap<ExcalidrawElement,
+  ExcalidrawElementWithCanvas>();
 
-const shapeCache = new WeakMap<
-  ExcalidrawElement,
-  Drawable | Drawable[] | null
->();
+const shapeCache = new WeakMap<ExcalidrawElement,
+  Drawable | Drawable[] | null>();
 
 export function getShapeForElement(element: ExcalidrawElement) {
   return shapeCache.get(element);
@@ -323,9 +319,9 @@ function drawElementFromCanvas(
   context.drawImage(
     elementWithCanvas.canvas!,
     (-(x2 - x1) / 2) * window.devicePixelRatio -
-      CANVAS_PADDING / elementWithCanvas.canvasZoom,
+    CANVAS_PADDING / elementWithCanvas.canvasZoom,
     (-(y2 - y1) / 2) * window.devicePixelRatio -
-      CANVAS_PADDING / elementWithCanvas.canvasZoom,
+    CANVAS_PADDING / elementWithCanvas.canvasZoom,
     elementWithCanvas.canvas!.width / elementWithCanvas.canvasZoom,
     elementWithCanvas.canvas!.height / elementWithCanvas.canvasZoom,
   );
@@ -427,6 +423,22 @@ export function renderElementToSvg(
           offsetY || 0
         }) rotate(${degree} ${cx} ${cy})`,
       );
+      svgRoot.appendChild(node);
+      break;
+    }
+    case "image": {
+      const elementWithCanvas = generateElement(element, generator);
+      const [x1, y1, x2, y2] = getElementAbsoluteCoords(element);
+      const shiftX = (x2 - x1) / 2 - (element.x - x1);
+      const shiftY = (y2 - y1) / 2 - (element.y - y1);
+      var node = document.createElementNS('http://www.w3.org/2000/svg','image');
+      node.setAttributeNS(null,'height','200');
+      node.setAttributeNS(null,'width','200');
+      node.setAttributeNS('xmlns','xlink','http://www.w3.org/1999/xlink');
+      node.setAttributeNS(null,'href', element.imageData);
+      node.setAttributeNS(null,'x','10');
+      node.setAttributeNS(null,'y','10');
+      node.setAttributeNS(null, 'visibility', 'visible');
       svgRoot.appendChild(node);
       break;
     }
