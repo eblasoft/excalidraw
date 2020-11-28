@@ -102,7 +102,6 @@ export function renderScene(
   if (!canvas) {
     return { atLeastOneVisibleElement: false };
   }
-
   const context = canvas.getContext("2d")!;
   context.scale(scale, scale);
 
@@ -513,7 +512,6 @@ export function renderSceneToSvg(
   // render elements
   elements.forEach((element) => {
     if (!element.isDeleted) {
-      console.log(element);
       renderElementToSvg(
         element,
         rsvg,

@@ -432,12 +432,12 @@ export function renderElementToSvg(
       const shiftX = (x2 - x1) / 2 - (element.x - x1);
       const shiftY = (y2 - y1) / 2 - (element.y - y1);
       var node = document.createElementNS('http://www.w3.org/2000/svg','image');
-      node.setAttributeNS(null,'height','200');
-      node.setAttributeNS(null,'width','200');
+      node.setAttributeNS(null,'height',String(elementWithCanvas.element.height));
+      node.setAttributeNS(null,'width',String(elementWithCanvas.element.width));
       node.setAttributeNS('xmlns','xlink','http://www.w3.org/1999/xlink');
       node.setAttributeNS(null,'href', element.imageData);
-      node.setAttributeNS(null,'x','10');
-      node.setAttributeNS(null,'y','10');
+      node.setAttributeNS(null,'x',String(shiftX));
+      node.setAttributeNS(null,'y',String(shiftY));
       node.setAttributeNS(null, 'visibility', 'visible');
       svgRoot.appendChild(node);
       break;

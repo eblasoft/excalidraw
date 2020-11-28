@@ -134,7 +134,7 @@ import {
 } from "../data/localStorage";
 
 import throttle from "lodash.throttle";
-import {exportToCanvas} from "../scene/export";
+import {exportToCanvas, exportToSvg} from "../scene/export";
 import {serializeAsJSON} from "../data/json";
 
 /**
@@ -313,6 +313,7 @@ class App extends React.Component<any, AppState> {
     });
     this.onSceneUpdated();
   };
+  private exportBackground: any;
 
   private initializeScene = async () => {
     const searchParams = new URLSearchParams(window.location.search);
@@ -349,7 +350,6 @@ class App extends React.Component<any, AppState> {
 
     // send event to parent
     window.addEventListener("message", (event) => {
-      console.log(event);
       if(event.data.isNew){
         const blob = new Blob([event.data.data], { type: 'application/json' });
         loadFromBlob(blob)
@@ -367,13 +367,20 @@ class App extends React.Component<any, AppState> {
             this.setState({ isLoading: false, errorMessage: error.message });
           });
       } else{
+        const svg = exportToCanvas(globalSceneState.getElements(), getDefaultAppState(),  {
+          exportBackground: false,
+          shouldAddWatermark: false,
+          viewBackgroundColor: '#000'});
         const tempCanvas = exportToCanvas(globalSceneState.getElements(), this.state, {
-          exportBackground : true,
+          exportBackground : false,
           viewBackgroundColor : "#ffffff",
           exportPadding : 10  ,
           scale : 1,
           shouldAddWatermark : false,
         });
+        // var s = new XMLSerializer();
+        // var str = s.serializeToString(svg);
+        // var svgBase64 = "data:image/svg+xml;base64," + btoa(str);
         const serialized = serializeAsJSON(globalSceneState.getElements(), this.state);
         window.parent.postMessage({canvas: tempCanvas.toDataURL() , json: serialized},event.data.origin);
       }
@@ -408,7 +415,6 @@ class App extends React.Component<any, AppState> {
         },
       });
     }
-
     this.removeSceneCallback = globalSceneState.addCallback(
       this.onSceneUpdated,
     );
@@ -551,6 +557,7 @@ class App extends React.Component<any, AppState> {
       cursorButton[socketID] = user.button;
     });
     const elements = globalSceneState.getElements();
+
     const { atLeastOneVisibleElement, scrollBars } = renderScene(
       elements.filter((element) => {
         // don't render text element that's being currently edited (it's

@@ -52,7 +52,6 @@ export function exportToCanvas(
     (shouldAddWatermark ? 0 : exportPadding);
 
   const tempCanvas: any = createCanvas(width, height);
-
   renderScene(
     sceneElements,
     appState,
@@ -73,7 +72,7 @@ export function exportToCanvas(
     {
       renderScrollbars: false,
       renderSelection: false,
-      renderOptimizations: false,
+      renderOptimizations: true,
     },
   );
 
@@ -99,7 +98,6 @@ export function exportToSvg(
     const [, , maxX, maxY] = getCommonBounds(elements);
     sceneElements = [...sceneElements, getWatermarkElement(maxX, maxY)];
   }
-  console.log(sceneElements);
 
   // calculate canvas dimensions
   const [minX, minY, maxX, maxY] = getCommonBounds(sceneElements);
@@ -147,7 +145,6 @@ export function exportToSvg(
     offsetX: -minX + exportPadding,
     offsetY: -minY + exportPadding,
   });
-
   return svgRoot;
 }
 
