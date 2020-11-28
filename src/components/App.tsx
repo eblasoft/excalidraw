@@ -134,7 +134,7 @@ import {
 } from "../data/localStorage";
 
 import throttle from "lodash.throttle";
-import {exportToCanvas, exportToSvg} from "../scene/export";
+import {exportToCanvas} from "../scene/export";
 import {serializeAsJSON} from "../data/json";
 
 /**
@@ -367,10 +367,6 @@ class App extends React.Component<any, AppState> {
             this.setState({ isLoading: false, errorMessage: error.message });
           });
       } else{
-        const svg = exportToCanvas(globalSceneState.getElements(), getDefaultAppState(),  {
-          exportBackground: false,
-          shouldAddWatermark: false,
-          viewBackgroundColor: '#000'});
         const tempCanvas = exportToCanvas(globalSceneState.getElements(), this.state, {
           exportBackground : false,
           viewBackgroundColor : "#ffffff",
@@ -378,9 +374,6 @@ class App extends React.Component<any, AppState> {
           scale : 1,
           shouldAddWatermark : false,
         });
-        // var s = new XMLSerializer();
-        // var str = s.serializeToString(svg);
-        // var svgBase64 = "data:image/svg+xml;base64," + btoa(str);
         const serialized = serializeAsJSON(globalSceneState.getElements(), this.state);
         window.parent.postMessage({canvas: tempCanvas.toDataURL() , json: serialized},event.data.origin);
       }
