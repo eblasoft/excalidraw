@@ -297,7 +297,6 @@ const LayerUI = ({
             zenModeEnabled && "transition-right"
           }`}
         >
-          <GitHubCorner />
         </aside>
       }
       {renderFooter()}
