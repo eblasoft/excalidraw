@@ -27,3 +27,8 @@
   color: var(--popup-text-color);
   font-size: 1.3em;
 }
+
+// hide some parts like github corner
+.layer-ui__wrapper__github-corner , .ShortcutsDialog-footer {
+    display: none !important;
+}
